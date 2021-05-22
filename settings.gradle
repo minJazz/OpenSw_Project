@@ -1,0 +1,2 @@
+rootProject.name = "OpenSw_Project"
+include ':app'
