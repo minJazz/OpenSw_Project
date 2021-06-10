@@ -39,11 +39,17 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
 
     public static HashMap<String, HashMap<String, String>> pList = new HashMap<>();
+    public static HashMap<String, HashMap<String, Object>> infoList = new HashMap<>();
+    public static HashMap<String, HashMap<String, String>> location = new HashMap<>();
     /*
         Tips
         key = String ex) A000
         value = HashMap<String, String> ex) key = (pName, product, pSize) value = String...
      */
+
+    public  static LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT);
+    public  static LinearLayout.LayoutParams params3 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT);
+    public  static LinearLayout.LayoutParams params4 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT);
 
     /*
     private void getHashKey() {
@@ -76,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         pName = findViewById(R.id.product_search);
         btn_search = findViewById(R.id.btn_search);
         btn_map = findViewById(R.id.btn_map);
-        listv = findViewById(R.id.listv);
+        listv = findViewById(R.id.listv2);
 
         mContext = getApplicationContext();
 
@@ -89,6 +95,38 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println(snapshot.getValue());
                 for (DataSnapshot key : snapshot.getChildren()) {
                     pList.put(key.getKey(), (HashMap<String, String>) key.getValue());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("products");
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());
+                for (DataSnapshot key : snapshot.getChildren()) {
+                    infoList.put(key.getKey(), (HashMap<String, Object>) key.getValue());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("geocode");
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());
+                for (DataSnapshot key : snapshot.getChildren()) {
+                    location.put(key.getKey(), (HashMap<String, String>) key.getValue());
+
                 }
             }
 
@@ -128,8 +166,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String pName_value;
-                pName_value = pName.getText().toString();
-
+                pName_value = pName.getText().toString().replace(" ", "" );
                 listv.removeAllViews();
 
                 Iterator<String> keys = pList.keySet().iterator();
@@ -149,9 +186,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT);
-    LinearLayout.LayoutParams params3 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT);
-    LinearLayout.LayoutParams params4 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT);
+
 
     public LinearLayout addProductView(String key, Object obj) {
 
@@ -183,92 +218,22 @@ public class MainActivity extends AppCompatActivity {
         t크기.setLayoutParams(params1);
         t크기.setGravity(Gravity.CENTER);
 
-
         t이름.setText(이름);
         t크기.setText(크기);
-
 
         v.addView(t이름);
         v.addView(t크기);
 
-
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(this, InfoActivit.class);
+                Intent intent = new Intent(getApplicationContext(), InfoActivity.class);
                 intent.putExtra("key", key);
+//                System.err.println("여기요"+infoList.get(key));
                 startActivity(intent);
             }
         });
 
         return v;
     }
-
-/*
-    public LinearLayout addProductView1(Object obj) {
-
-
-        String 이름;
-        String 주소;
-        String 거리;
-        String 가격;
-        String 크기;
-
-        HashMap<String, String> ds = (HashMap<String, String>) obj;
-
-        이름 = ds.get("pName");
-        크기 = ds.get("pSize");
-
-
-        LinearLayout v = new LinearLayout(mContext);
-
-        v.setPadding(40, 40, 40, 40);
-        params1.weight = 1f;
-        params3.weight = 3f;
-        params4.weight = 4f;
-
-
-        TextView t이름 = new TextView(mContext);
-
-        TextView t주소 = new TextView(mContext);
-        t주소.setLayoutParams(params3);
-        TextView t거리 = new TextView(mContext);
-        t거리.setLayoutParams(params1);
-
-        TextView t크기 = new TextView(mContext);
-
-        TextView t가격 = new TextView(mContext);
-
-        t가격.setText("12345");
-        t주소.setText("선문로221번길 40-3 다온빌 307호");
-        t거리.setText("5Km");
-        t이름.setText(이름);
-        t크기.setText(크기);
-
-        LinearLayout 가격사이즈 = new LinearLayout(mContext);
-        가격사이즈.setOrientation(LinearLayout.VERTICAL);
-        가격사이즈.addView(t가격);
-        가격사이즈.addView(t크기);
-        가격사이즈.setLayoutParams(params1);
-
-        LinearLayout 주소거리 = new LinearLayout(mContext);
-        주소거리.setOrientation(LinearLayout.HORIZONTAL);
-        주소거리.addView(t주소);
-        주소거리.addView(t거리);
-
-        LinearLayout 이름_주소거리 = new LinearLayout(mContext);
-        이름_주소거리.setOrientation(LinearLayout.VERTICAL);
-        이름_주소거리.addView(t이름);
-        이름_주소거리.addView(주소거리);
-        이름_주소거리.setLayoutParams(params4);
-
-        v.addView(이름_주소거리);
-        v.addView(가격사이즈);
-
-
-        return v;
-    }
-
- */
-
 }
